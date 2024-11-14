@@ -31,4 +31,10 @@ class todoService {
         this.saveData(todos)
         return todos[todoIndex]
     }
+
+    deleteTodo(id){
+        let todos = this.getData()
+        todos = todos.filter(todo => todo.id !== parseInt(id))
+        this.saveData(todos)
+    }
 }
