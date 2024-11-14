@@ -38,3 +38,5 @@ class todoService {
         this.saveData(todos)
     }
 }
+
+export default new todoService()
