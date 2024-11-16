@@ -22,12 +22,13 @@ class todoService {
         return newTodo
     }
 
-    updateTodo(id, title, description){
+    updateTodo(data){
         const todos = this.getData()
         const todoIndex = todos.findIndex(todo => todo.id === id)
         if(todoIndex === -1) throw new Error('Task not found in db')
-        todos[todoIndex].title = title
-        todos[todoIndex].description = description
+        todos[todoIndex] = {
+            ...todos[todoIndex],
+            ...data}
         this.saveData(todos)
         return todos[todoIndex]
     }
