@@ -33,12 +33,12 @@ class todoService {
 
     async updateTodo(data){
         const todos = await this.getData()
-        const {id} = data
+        const {id, name, description, complete} = data
         const todoIndex = todos.findIndex(todo => todo.id === id)
         if(todoIndex === -1) throw new Error('Task not found in db')
-        todos[todoIndex] = {
-            ...todos[todoIndex],
-            ...data}
+        if (name !== undefined) todos[todoIndex].name = name;
+        if (description !== undefined) todos[todoIndex].description = description;
+        if (complete !== undefined) todos[todoIndex].complete = complete;
         this.saveData(todos)
         return todos[todoIndex]
     }
