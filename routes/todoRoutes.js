@@ -1,14 +1,10 @@
 import express from 'express';
-import { getAllTodos} from '../controllers/todoController.js';
+import { getAllTodos, createTodo } from '../controllers/todoController.js';
 
 const router = express.Router();
 
 router.get('/todos', getAllTodos);
-router.post('/todos', (req, res) => {
-    res.json({
-        message: 'Todo created'
-    });
-})
+router.post('/todos', createTodo);
 router.put('/todos/:id', (req, res) => {
     res.json({
         message: 'Todo updated'
