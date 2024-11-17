@@ -1,47 +1,52 @@
 import Todo from './todo.js'
-import fs from 'fs'
+import fs from 'fs/promises'
 import {v4 as uuidv4} from 'uuid'
 import { fileURLToPath } from "url";
 import path from "path";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-let filePath = path.resolve(__dirname, '../database/todos.json')
 
 class todoService {
-    getData(){
-        const data = fs.readFileSync(filePath, 'utf-8')
-        const todos = JSON.parse(data)
-        return todos.map(todo => new Todo(todo.id, todo.name, todo.description, todo.complete))
+    constructor(){
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        this.filePath = path.resolve(__dirname, '../database/todos.json')
+    }
+    async getData(){
+        try {
+            const data = await fs.readFile(this.filePath, 'utf-8')
+            return JSON.parse(data)
+        } catch (error) {
+            throw new Error(error);
+        }
     }
 
-    saveData(todos){
-        fs.writeFileSync(filePath, JSON.stringify(todos, null, 2))
+    async saveData(todos){
+        fs.writeFile(this.filePath, JSON.stringify(todos, null, 2), 'utf-8')
     }
 
-    createTodo(name, description){
-        const todos = this.getData()
+    async createTodo(name, description){
+        const todos = await this.getData()
         const newTodo = new Todo(uuidv4(), name, description, false)
         todos.push(newTodo)
         this.saveData(todos)
         return newTodo
     }
 
-    updateTodo(data){
-        const todos = this.getData()
-        const {id} = data
+    async updateTodo(data){
+        const todos = await this.getData()
+        const {id, name, description, complete} = data
         const todoIndex = todos.findIndex(todo => todo.id === id)
         if(todoIndex === -1) throw new Error('Task not found in db')
-        todos[todoIndex] = {
-            ...todos[todoIndex],
-            ...data}
+        if (name !== undefined) todos[todoIndex].name = name;
+        if (description !== undefined) todos[todoIndex].description = description;
+        if (complete !== undefined) todos[todoIndex].complete = complete;
         this.saveData(todos)
         return todos[todoIndex]
     }
 
-    deleteTodo(id){
-        let todos = this.getData()
-        todos = todos.filter(todo => todo.id !== parseInt(id))
-        this.saveData(todos)
+    async deleteTodo(id){
+        let todos = await this.getData()
+        todos = todos.filter(todo => todo.id !== (id))
+        await this.saveData(todos)
     }
 }
 
